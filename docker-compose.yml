@@ -1,0 +1,62 @@
+version: '3.8'
+
+services:
+  node_exporter:
+    image: prom/node-exporter
+    expose:
+      - 9100
+    restart: always
+    command:
+      - "--path.rootfs=/host"
+    volumes:
+      - "/:/host:ro,rslave"
+    pid: host
+    networks:
+      monitor-network:
+        aliases:
+          - node_exporter
+
+  cadvisor:
+    image: google/cadvisor:latest
+    expose:
+      - 8080
+    restart: unless-stopped
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:rw
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    networks:
+      monitor-network:
+        aliases:
+          - cadvisor
+
+  prometheus:
+    image: prom/prometheus
+    expose:
+      - 9090
+    restart: always
+    volumes:
+        - "./prometheus.yml:/etc/prometheus/prometheus.yml"
+    command:
+      - '--storage.tsdb.retention.time=30d'
+      - '--storage.tsdb.retention.size=5GB'
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    networks:
+      monitor-network:
+        aliases:
+          - prometheus
+
+  grafana:
+    image: grafana/grafana
+    ports:
+      - "3000:3000"
+    networks:
+      monitor-network:
+        aliases:
+          - grafana
+    
+# Network
+networks:
+  monitor-network:
+    driver: bridge
