@@ -11,7 +11,7 @@ http://docker-host:3000
 ```
 3. Add prometheus as datasource.
 ```
-http://prometheus:9000
+http://prometheus:9090
 ```
 ![Datasource](document/datasource.png)
 
