@@ -45,6 +45,9 @@ services:
       - '--storage.tsdb.retention.time=30d'
       - '--storage.tsdb.retention.size=5GB'
       - '--config.file=/etc/prometheus/prometheus.yml'
+    depends_on:
+      - "node_exporter"
+      - "cadvisor"
     networks:
       monitor-network:
         aliases:
