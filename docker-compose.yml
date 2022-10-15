@@ -41,6 +41,7 @@ services:
     restart: always
     volumes:
         - "./prometheus.yml:/etc/prometheus/prometheus.yml"
+        - "prometheus-storage:/prometheus"
     command:
       - '--storage.tsdb.retention.time=30d'
       - '--storage.tsdb.retention.size=5GB'
@@ -57,6 +58,8 @@ services:
     image: grafana/grafana
     ports:
       - "3000:3000"
+    volumes:
+        - "grafana-storage:/var/lib/grafana"
     networks:
       monitor-network:
         aliases:
