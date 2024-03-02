@@ -14,6 +14,7 @@ http://docker-host:3000
 http://prometheus:9090
 ```
 ![Datasource](document/datasource.png)
+
 4. Add loki as datasource.
 ```
 http://loki:3100
