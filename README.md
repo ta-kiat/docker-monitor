@@ -29,4 +29,4 @@ http://loki:3100
     - [Docker Container](https://grafana.com/grafana/dashboards/11600)
     - [Docker monitoring with node selection](https://grafana.com/grafana/dashboards/8321)
   - Log monitor
-    - [Container Log Dashboard](https://grafana.com/grafana/dashboards/16966-container-log-dashboard)
+    - [docker log](report/docker-log.json)
