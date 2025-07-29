@@ -1,0 +1,1 @@
+ docker compose -f docker-compose.yml -f docker-compose-agent.yml build && docker compose -f docker-compose.yml -f docker-compose-agent.yml down -v &&  docker compose -f docker-compose.yml -f docker-compose-agent.yml up -d

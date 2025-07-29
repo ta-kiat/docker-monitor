@@ -1,15 +1,13 @@
-version: '3.8'
-
 services:
   node_exporter:
     image: prom/node-exporter:latest
     expose:
       - 9100
     restart: unless-stopped
-    command:
-      - "--path.rootfs=/host"
     volumes:
       - "/:/host:ro,rslave"
+    command:
+      - "--path.rootfs=/host"
     pid: host
     networks:
       monitor-network:
@@ -17,13 +15,13 @@ services:
           - node_exporter
 
   cadvisor:
-    image: google/cadvisor:latest
+    image: gcr.io/cadvisor/cadvisor
     expose:
       - 8080
     restart: unless-stopped
     volumes:
       - /:/rootfs:ro
-      - /var/run:/var/run:rw
+      - /var/run:/var/run:ro
       - /sys:/sys:ro
       - /var/lib/docker/:/var/lib/docker:ro
     command:
@@ -46,37 +44,10 @@ services:
       - '--storage.tsdb.retention.time=30d'
       - '--storage.tsdb.retention.size=5GB'
       - '--config.file=/etc/prometheus/prometheus.yml'
-    depends_on:
-      - "node_exporter"
-      - "cadvisor"
     networks:
       monitor-network:
         aliases:
           - prometheus
-
-  loki:
-    image: grafana/loki:latest
-    restart: unless-stopped
-    expose:
-      - 3100
-    volumes:
-      - loki-storage:/loki
-    networks:
-      monitor-network:
-        aliases:
-          - loki
-
-  promtail:
-    image: grafana/promtail
-    restart: unless-stopped
-    volumes:
-      - ./promtail.yml:/etc/promtail/config.yml
-      - /var/run/docker.sock:/var/run/docker.sock
-      - /var/lib/docker/containers:/var/lib/docker/containers
-    networks:
-      monitor-network:
-        aliases:
-          - promtail
 
   grafana:
     image: grafana/grafana:latest
@@ -89,7 +60,7 @@ services:
           - grafana
     volumes:
       - grafana-storage:/var/lib/grafana
-    
+
 # Network
 networks:
   monitor-network:
@@ -98,5 +69,14 @@ networks:
 # Volumes
 volumes:
   prometheus-storage:
+    driver: local
+    driver_opts:
+      type: none
+      device: ./data/prometheus
+      o: bind
   grafana-storage:
-  loki-storage:
+    driver: local
+    driver_opts:
+      type: none
+      device: ./data/grafana
+      o: bind
