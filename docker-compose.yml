@@ -51,15 +51,44 @@ services:
 
   grafana:
     image: grafana/grafana:latest
-    restart: unless-stopped
     ports:
       - "3000:3000"
+    restart: unless-stopped
+    volumes:
+      - grafana-storage:/var/lib/grafana
     networks:
       monitor-network:
         aliases:
           - grafana
+
+  loki:
+    image: grafana/loki:latest
+    expose:
+      - 3100
+    restart: unless-stopped
     volumes:
-      - grafana-storage:/var/lib/grafana
+      - ./loki.yml:/etc/loki/local-config.yaml
+    command: -config.file=/etc/loki/local-config.yaml
+    networks:
+      monitor-network:
+        aliases:
+          - loki
+
+
+  api-gateway-loki:
+    image: nginx:stable-alpine
+    ports:
+      - ${LOKI_PORT}:3100
+    restart: unless-stopped
+    volumes:
+      - ./api-gateway/nginx-loki.conf:/etc/nginx/conf.d/default.conf
+      - ./api-gateway/.htpasswd:/etc/nginx/.htpasswd
+    env_file:
+      - ./.env
+    networks:
+      monitor-network:
+        aliases:
+          - api-gateway
 
 # Network
 networks:
@@ -80,3 +109,4 @@ volumes:
       type: none
       device: ./data/grafana
       o: bind
+

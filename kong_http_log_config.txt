@@ -1,0 +1,27 @@
+local ts=string.format('%18.0f', os.time()*1000000000) 
+local log_payload = kong.log.serialize() 
+local request = log_payload['request'] 
+local service = log_payload['service'] 
+local response = log_payload['response'] 
+local latencies = log_payload['latencies'] 
+local t = {
+	{
+		stream = {
+			gateway='total-latency', service=service['name'], upstream_uri=log_payload['upstream_uri'], status=response['status'] 
+		}, values={
+			{
+				ts, 'ip='..log_payload['client_ip']
+				..' duration_total='..latencies['request']
+				..' duration_api='..latencies['proxy']
+				..' duration_kong='..latencies['kong']..'ms'
+				..' request_url='..request['url']
+				..' request_method='..request['method']
+				..' request_size='..request['size']
+				..' upstream_uri='..log_payload['upstream_uri']
+				..' status='..response['status']
+				..' size='..response['size']
+			}
+		}
+	} 
+} 
+return t
