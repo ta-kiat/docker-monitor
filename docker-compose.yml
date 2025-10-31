@@ -67,6 +67,7 @@ services:
       - 3100
     restart: unless-stopped
     volumes:
+      - loki-storage:/loki
       - ./loki.yml:/etc/loki/local-config.yaml
     command: -config.file=/etc/loki/local-config.yaml
     networks:
@@ -74,6 +75,19 @@ services:
         aliases:
           - loki
 
+  fluent-bit:
+    image: fluent/fluent-bit:latest
+    expose:
+      - 3100
+    restart: unless-stopped
+    volumes:
+      - ./fluent-bit.conf:/fluent-bit/etc/fluent-bit.conf:ro
+      - ./parsers.conf:/fluent-bit/etc/parsers.conf:ro
+    command: ["-c", "/fluent-bit/etc/fluent-bit.conf"]
+    networks:
+      monitor-network:
+        aliases:
+          - fluent-bit
 
   api-gateway-loki:
     image: nginx:stable-alpine
@@ -88,7 +102,7 @@ services:
     networks:
       monitor-network:
         aliases:
-          - api-gateway
+          - api-gateway-loki
 
 # Network
 networks:
@@ -109,4 +123,11 @@ volumes:
       type: none
       device: ./data/grafana
       o: bind
+  loki-storage:
+    driver: local
+    driver_opts:
+      type: none
+      device: ./data/loki
+      o: bind
+
 

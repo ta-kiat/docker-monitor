@@ -1,3 +1,4 @@
+
 # This is a complete configuration to deploy Loki backed by the filesystem.
 # The index will be shipped to the storage via tsdb-shipper.
 
@@ -12,7 +13,7 @@ common:
     kvstore:
       store: inmemory
   replication_factor: 1
-  path_prefix: /tmp/loki
+  path_prefix: /loki
 
 schema_config:
   configs:
@@ -26,4 +27,4 @@ schema_config:
 
 storage_config:
   filesystem:
-    directory: /tmp/loki/chunks
+    directory: /loki/chunks
