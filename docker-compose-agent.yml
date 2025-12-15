@@ -17,7 +17,7 @@ services:
       - ./.env
 
   cadvisor:
-    image: gcr.io/cadvisor/cadvisor
+    image: ghcr.io/google/cadvisor:latest
     expose:
       - 8080
     restart: unless-stopped
